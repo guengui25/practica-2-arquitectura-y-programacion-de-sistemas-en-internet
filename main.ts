@@ -1,4 +1,4 @@
-//Creo el tipo jugador (tipo para almacenar en MONGO DB)
+//Creo el tipo jugador (tipo para almacenar en MONGO DB - Al final no es necesario)
 interface jugador { nombre:string, 
                     aciertos:number, 
                     errores:number
@@ -21,9 +21,8 @@ interface partida { n_jugadores:number,
                     preguntas_realizadas?:any[]
 }
 
-
 //Función que inicializa la partida
-const inicializar = (): partida => {
+const inicializar = (): partida => {    //Esto no lo pide la práctica y hay maneras más elegantes de hacerlo, pero no he querido complicarme la vida demasiado
 
     console.log("|> |> |> |> |> |> |> |> |> |> |> |> |> |> |> |> |> |> |> |> |>");
     console.log("       Bienvido al trivial (el juego de los quesitos)         ");
@@ -31,14 +30,15 @@ const inicializar = (): partida => {
 
     const partida:partida = {n_jugadores:0,jugadores:[],n_preguntas:0,preguntas:[]}  //Creo la partida
     
-    let temp:number = 0;
+    //Como voy a ir variando su valor, tienen que ser variables
+    let temp:number|string = 0;
     let check:boolean = false;
 
     //Pido el numero de jugadores, si es 0 o introduce una cadena de texto, lo pido hasta que introduzca algo válido
     do{
         temp = parseInt(prompt("Introduzca el numero de jugadores \n")||"0");          //https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/parseInt
 
-        if (!isNaN(temp) && temp > 0) check = true;
+        if (!isNaN(temp) && temp > 0) check = true; //Si es un número y es > 0, permito ese nº de jugadores
         else console.log("Error: Introduce un numero valido de jugadores (minimo 1) \n")
     }
     while (!check)
@@ -46,36 +46,36 @@ const inicializar = (): partida => {
     //Lo meto en la partida
     partida.n_jugadores = temp;
 
-    //Reinicio los valores tras su uso
-    temp = 0;
+    //Reinicio los valores auxiliares tras su uso
+    temp = "";
     check = false;
 
-    //Creo el string[] para almacenar los nombres de los jugadores
-    const nombres_jugadores: string[] = [];
-
     do{
-        while(nombres_jugadores.length < partida.n_jugadores){
-            nombres_jugadores.push(prompt(`Introduzca el nombre del jugador ${nombres_jugadores.length + 1} \n`)||"undefined"); //Si no se pone el nombre se toma undefined
+        check = true;
+
+        temp = prompt(`Introduzca el nombre del jugador ${partida.jugadores.length + 1} \n`)||"undefined" ; //Si no se pone el nombre se toma undefined
+
+        //Si temp es undefined, es decir, no ha introducido su nombre correctamente
+        if(temp === "undefined"){
+
+            console.log("Error: Introduce un nombre valido para los jugadores \n")
+            check = false;
         }
-        check = true; //Asumo que todos los jugadores han puesto su nombre correctamente
-        nombres_jugadores.forEach(element => {
-            if(element === "undefined"){
-                check = false;
-                nombres_jugadores.length = 0;   //Vacio el string[] ya que hay un nombre que no está bien definido              //https://es.stackoverflow.com/questions/103670/c%C3%B3mo-vaciar-un-array-en-javascript
-                console.log("Error: Introduce un nombre valido para los jugadores \n")
-            }
-        });
+        
+        //Creo el jugador y lo agrego a la partida
+
+        if(check){ //Si ha introducido el nombre bien
+            const jugador = {nombre:temp,aciertos:0,errores:0};
+            partida.jugadores.push(jugador);
+        }
+
 
     }
-    while(!check)
+    while(partida.jugadores.length < partida.n_jugadores)
 
-    //Creo los jugadores
-    nombres_jugadores.forEach(element => {
-        const jugador = {nombre:element,aciertos:0,errores:0};
-        partida.jugadores.push(jugador);
-    });
 
     //Reinicio los valores tras su uso
+    temp = 0;
     check = false;
 
     //Pido el numero de preguntas, si es 0 o introduce una cadena de texto, lo pido hasta que introduzca algo válido
@@ -89,12 +89,6 @@ const inicializar = (): partida => {
 
     partida.n_preguntas = temp;
 
-    //Reinicio los valores tras su uso
-    temp = 0;
-    check = false;
-
-
-
     console.log("Bienvenidos "+ partida.jugadores.map(element =>element.nombre).join(", ")             //https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Array/join
     + " vais a responder",partida.n_preguntas,"preguntas cada uno.\n");
 
@@ -103,7 +97,7 @@ const inicializar = (): partida => {
 
 //Hago uso de la API https://opentdb.com/api_config.php?ref=apislist.com
 
-const jugar_preguntas = (partida:partida,URL:string) => {
+const jugar_preguntas = (partida:partida,URL:string) => {           //Ya hemos dado las promesas asíncronas, pero esta práctica te la entrego así ya que casi la acabé así
 
     fetch(URL)  //.then hace promesas --> Try ... Catch ... usando internet
     .then(res =>res.json()) //Primera promesa para obtener los datos y hacerlos JSON    
@@ -121,7 +115,6 @@ const jugar_preguntas = (partida:partida,URL:string) => {
     //console.log(partida);
 
     jugar(partida);
-
 
     }
 );};
@@ -182,15 +175,6 @@ const finalizar_partida = (partida:partida) => {
 }
 
 
-//===============================================================
-//https://www.mongodb.com/developer/languages/rust/getting-started-deno-mongodb/
-
-
-
-
-
-//===============================================================
-
 //Main del codigo, se inicializa la partida y luego se llama a la función que trabaja con la promesa
 const main = () => {
 
@@ -206,30 +190,3 @@ const main = () => {
 }
 
 main();
-
-
-/*Codigo para respuesta multiple y múltiples solicitudes seguidas (Manera simplificada)
-
-
-const solicitar_preguntas = (jugador:jugador,URL:string) => fetch(URL) 
-    .then(res =>res.json()) //Primera promesa para obtener los datos y hacerlos JSON    //.then hace promesas --> Try ... Catch ... usando internet
-    .then(data => {                    //Segunda promesa donde trabajo con los datos
-        
-        console.log("Es el turno de",jugador.nombre)
-
-        data.results.forEach((result: any) => {
-
-        console.log(result.question);
-        const resp_ale: string[] = [result.correct_answer,result.incorrect_answers];
-
-
-        console.log(resp_ale.flat().sort(() => Math.random() - 0.5)); //Desordeno la respuesta correcta
-
-        const respuesta = prompt("Respuesta: ");
-
-        if (respuesta=== result.correct_answer){console.log("Has acertado!!!"); jugador.aciertos=+1} 
-        else {console.log("Has fallado, la respuesta correcta era: ",result.correct_answer);jugador.errores=+1; }
-                });
-            }
-        );
-*/

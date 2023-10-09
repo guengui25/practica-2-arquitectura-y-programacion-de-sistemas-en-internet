@@ -22,12 +22,6 @@ Para responder a la pregunta el jugador introducirá un número en consola indic
 
 Tras haber escrito la respuesta se le indicará si es correcto o no y se pasará al siguiente jugador. Así hasta terminar el juego e indicar el ganador con mayor número de aciertos (o varios en caso de empate).
 
-Una vez terminado el juego se guardará en mongo un dato sobre cada usuario con su número total de aciertos y errores.
-
-Desde el momento en que existan jugadores en la colección de mongo al iniciar el juego saldrá una tabla resumen con todos los jugadores anteriores y sus estadísticas.
-
 ## Puntos extra:
 - Las categorías de cada pregunta no se deberán repetir siempre que haya menos preguntas que posibles categorías.
 - Opción de dificultad de las preguntas para cada jugador.
-- Guardar en mongo las preguntas erróneas de cada jugador
-- Dar opción a ver las preguntas erróneas del jugador al introducir su nombre si ya existen en la colección
