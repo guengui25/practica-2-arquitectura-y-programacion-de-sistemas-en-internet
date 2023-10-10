@@ -49,5 +49,3 @@ const getPregunta = async (         n_preguntas: number,        //Creo uno que s
 }
 
 export default getPregunta;
-
-//Cuando las funciones son largas se crea un archivo para cada función
